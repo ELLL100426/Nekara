@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri Etalase Museum</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: transparent;
+        }
+
+        .gallery-container {
+            max-width: 400px;
+            /* Menyesuaikan lebar di dalam popup Lapentor */
+            margin: auto;
+            text-align: center;
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .slide-title {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        /* Container khusus gambar biar tombol bisa nempel di kiri-kanannya */
+        .image-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            max-width: 356px;
+            border-radius: 8px;
+            object-fit: cover;
+            /* Tambahan transisi biar pergantian gambar lebih smooth */
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Desain tombol navigasi */
+        .btn-nav {
+            position: absolute;
+            background-color: rgba(211, 84, 0, 0.85);
+            /* Sedikit transparan */
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+            z-index: 10;
+            /* Biar tombol selalu ada di atas gambar */
+        }
+
+        .btn-nav:hover {
+            background-color: rgba(160, 64, 0, 1);
+        }
+
+        /* Set posisi tombol tepat di kiri dan kanan gambar */
+        .prev {
+            left: 5px;
+        }
+
+        .next {
+            right: 5px;
+        }
+
+        .slide-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 15px;
+            line-height: 1.5;
+            text-align: justify;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="gallery-container">
+        <!-- Judul akan berubah otomatis -->
+        <div class="slide-title" id="judul-hewan">Memuat...</div>
+
+        <div class="image-wrapper">
+            <!-- Tombol Before / Prev -->
+            <button class="btn-nav prev" id="btn-prev" onclick="gantiSlide(-1)">&#10094;</button>
+
+            <!-- Gambar utama -->
+            <img id="gambar-hewan" src="" alt="Koleksi Museum">
+
+            <!-- Tombol Next -->
+            <button class="btn-nav next" id="btn-next" onclick="gantiSlide(1)">&#10095;</button>
+        </div>
+
+        <!-- Keterangan akan berubah otomatis -->
+        <div class="slide-desc" id="keterangan-hewan">Memuat keterangan...</div>
+    </div>
+
+    <script>
+        // 1. Tempat lu masukin Judul, Link Gambar, dan Keterangan
+        // Cukup edit teks di dalam tanda kutip ini aja ya
+        const koleksiData = [
+            {
+                judul: "Nekara",
+                gambar: "Nekara.jpg",
+                keterangan: "Nekara dibuat dari bahan tembaga sebagai bahan utama yang dicampur dengan timah hitam dan timah putih sehingga menghasilkan bahan yang lebih kuat yang disebut perunggu. Nekara dibuat dengan menggunakan teknik a cire perdue. Cetakan nekara dibuat dari lilin sehingga ia sering disebut cetakan hilang. Dua buah Nekara ditemukan oleh tiga orang petani pada tahun 1991 di situs Bukit Selindung Pemangkat Kabupaten Sambas. Survey terhadap Nekara yang ditemukan di Bukit Selindung, telah dilakukan oleh Dra. D.D. Bintarti, Prof. Dr. R.P. Soejono, dan Soeroso, tim peneliti dari Pusat Penelitian Arkeologi Nasional, pada bulan Maret 1992. Kemudian pada bulan Juli 1993, tim peneliti dari Pusat Penelitian Arkeologi Nasional tersebut melakukan Penelitian Kepurbakalaan di situs Bukit Selindung . Pada tahun 1992, dua buah Nekara yang berasal dari Bukit Selindung, Pemangkat, Kabupaten Sambas, Kalimantan Barat tersebut menjadi koleksi masterpiece di UPT Museum Provinsi Kalimantan Barat. Nekara jenis ini termasuk Tipe Heger IV yang terdiri dari 3 bagian, yakni bidang pukul, bagian bahu, dan bagian kaki. Pada bidang pukul nekara terdapat motif bintang bersudut 12 yang menggambarkan kosmos. Pada lingkaran terdapat hiasan berupa garis-garis, burung, meander miring dan gelombang (tumpal). Pada bagian bahu nekara terdapat hiasan garis-garis pendek vertikal dan tumpal. Garis pendek pola tangga menghiasi bagian tengah/pinggang nekara. Pada bagian kaki nekara tidak diberi hiasan. Benda-benda perunggu yang ditemukan di Indonesia menunjukkan persamaan dengan yang ditemukan di Dongson (Vietnam) baik bentuk maupun pola hiasnya. Oleh karena itu, nekara yang dibuat pada sekitar abad ke-6 hingga ke-3 SM ini dikenal sebagai kebudayaan Dongson atau kebudayaan perunggu. Nekara digunakan sebagai perlengkapan upacara kesuburan tanah atau upacara pertanian."
+            }
+        ];
+
+        let indexSekarang = 0;
+
+        // Ambil elemen HTML yang akan dimanipulasi
+        const elemenJudul = document.getElementById('judul-hewan');
+        const elemenGambar = document.getElementById('gambar-hewan');
+        const elemenKeterangan = document.getElementById('keterangan-hewan');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        function updateTampilan() {
+            // Ganti konten sesuai data array
+            elemenJudul.innerText = koleksiData[indexSekarang].judul;
+            elemenGambar.src = koleksiData[indexSekarang].gambar;
+            elemenKeterangan.innerText = koleksiData[indexSekarang].keterangan;
+
+            // Logika sesuai revisi dosen:
+            // Sembunyikan tombol Prev jika sedang di gambar urutan pertama (index 0)
+            if (indexSekarang === 0) {
+                btnPrev.style.display = 'none';
+            } else {
+                btnPrev.style.display = 'flex';
+            }
+
+            // Sembunyikan tombol Next jika sedang di gambar urutan terakhir
+            if (indexSekarang === koleksiData.length - 1) {
+                btnNext.style.display = 'none';
+            } else {
+                btnNext.style.display = 'flex';
+            }
+        }
+
+        function gantiSlide(arah) {
+            indexSekarang += arah;
+            updateTampilan();
+        }
+
+        // Jalankan fungsi saat web pertama kali dirender
+        updateTampilan();
+    </script>
+
+</body>
+
+</html>
